@@ -5,9 +5,14 @@ $ pip install google-generativeai
 """
 
 import os
+from dotenv import load_dotenv
 import google.generativeai as genai
 
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+# Load environment variables from .env file
+load_dotenv()
+
+# Configure the API key
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 # Create the model
 generation_config = {
@@ -114,6 +119,9 @@ chat_session = model.start_chat(
   ]
 )
 
-response = chat_session.send_message("INSERT_INPUT_HERE")
+# response = chat_session.send_message("INSERT_INPUT_HERE")
+def calculate_expression(expression):
+    response = chat_session.send_message(expression)
+    return response["parts"]
 
-print(response.text)
+# print(response.text)
