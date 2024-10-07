@@ -1,3 +1,4 @@
+import os
 import torch
 from torch.utils.data import Dataset, DataLoader
 from transformers import ViTFeatureExtractor, AutoTokenizer, VisionEncoderDecoderModel, Seq2SeqTrainer, Seq2SeqTrainingArguments
@@ -34,11 +35,24 @@ class HandwrittenEquationDataset(Dataset):
 
         return pixel_values, labels
 
+def load_dataset(data_dir):
+    image_paths = []
+    labels = []
+    labels_file = os.path.join(data_dir, "labels.txt")
+
+    with open(labels_file, "r") as f:
+        for line in f:
+            filename, equation = line.strip().split(maxsplit=1)
+            image_path = os.path.join(data_dir, filename)
+            if os.path.exists(image_path):
+                image_paths.append(image_path)
+                labels.append(equation)
+    
+    return image_paths, labels
+
 # Prepare dataset
-train_image_paths = ["path/to/train/image1.png", "path/to/train/image2.png", ...]
-train_labels = ["equation1", "equation2", ...]
-val_image_paths = ["path/to/val/image1.png", "path/to/val/image2.png", ...]
-val_labels = ["equation1", "equation2", ...]
+train_image_paths, train_labels = load_dataset("dataset\train")
+val_image_paths, val_labels = load_dataset("dataset\val")
 
 train_dataset = HandwrittenEquationDataset(train_image_paths, train_labels, feature_extractor, tokenizer)
 val_dataset = HandwrittenEquationDataset(val_image_paths, val_labels, feature_extractor, tokenizer)
